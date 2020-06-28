@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d06d66fb0c24d5a42a4804bc5bca79a9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - costumes: {fileID: 2159241639538995990, guid: 90804204cad6e3345954c2359c1a1688,
+      type: 3}
+  - powerups: {fileID: 1005289359119806257, guid: 09d4fb0ad2badb44f9bf76c5fb46d340,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

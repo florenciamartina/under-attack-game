@@ -3,14 +3,19 @@ using UnityEngine.Events;
 
 public class CharacterController2D : MonoBehaviour
 {
+	[Header("Jump Controls")]
 	[SerializeField] private float m_JumpForce = 250f;							// Amount of force added when the player jumps.
 	
 	[SerializeField] private float m_WallJumpForce = 150f;
 	[SerializeField] private float m_WallJumpPushForce = 720f;
 	[SerializeField] private float m_WallFriction = -50f;
+	[SerializeField] private float wallJumpInterval = 0.2f;
+	private float currWallJumpTime = 0f;
 	[SerializeField] private float m_DJumpForce = 200f;
-
 	private bool canDoubleJump = true;
+	[SerializeField] private AudioSource jumpSound;
+
+	[Header("Basic Movement")]
 
 	[Range(0, .3f)] [SerializeField] private float m_MovementSmoothing = .05f;	// How much to smooth out the movement
 	[SerializeField] private bool m_AirControl = false;							// Whether or not a player can steer while jumping.
@@ -37,16 +42,14 @@ public class CharacterController2D : MonoBehaviour
 	[System.Serializable]
 	public class BoolEvent : UnityEvent<bool> { }
 
-	private void Awake()
-	{
+	private void Awake() {
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
 		if (OnLandEvent == null)
 			OnLandEvent = new UnityEvent();
 	}
 
-	private void FixedUpdate()
-	{
+	private void FixedUpdate() {
 		bool wasGrounded = m_Grounded;
 		m_Grounded = false;
 
@@ -55,8 +58,7 @@ public class CharacterController2D : MonoBehaviour
 		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
 		for (int i = 0; i < colliders.Length; i++)
 		{
-			if (colliders[i].gameObject != gameObject)
-			{
+			if (colliders[i].gameObject != gameObject) {
 				m_Grounded = true;
 				canDoubleJump = true; // Added
 				if (!wasGrounded)
@@ -69,10 +71,18 @@ public class CharacterController2D : MonoBehaviour
 		// if (m_TouchingWall) {
 		// 	m_Grounded = false;
         // }
+		// isJumping = false;
 	}
 
-	public void Move(float move, bool jump)
-	{
+	private void Update() {
+		if (m_Grounded) {
+			currWallJumpTime = 0;
+		} else if (!m_Grounded && m_TouchingWall) {
+			currWallJumpTime -= Time.deltaTime;
+		}
+	}
+
+	public void Move(float move, bool jump) {
 
 		//only control the player if grounded or airControl is turned on
 		if (m_Grounded || m_AirControl) {
@@ -100,11 +110,13 @@ public class CharacterController2D : MonoBehaviour
 		if (!m_Grounded && canDoubleJump && jump) {
 			m_Rigidbody2D.AddForce(new Vector2(m_Rigidbody2D.velocity.x, m_DJumpForce));
 			canDoubleJump = false;
+			jumpSound.Play();
 		}
 
 		// If the player is touching the wall and jumps...
 		if (!m_Grounded && m_TouchingWall && jump) {
-			if (move == 0) {
+
+			if (move == 0 && currWallJumpTime <= 0) {
 				WallJump();
 			} else if ((m_FacingRight && move > 0) || (!m_FacingRight && move < 0)) {
 				m_Rigidbody2D.AddForce(new Vector2(0f, m_WallFriction));
@@ -114,6 +126,7 @@ public class CharacterController2D : MonoBehaviour
 		} else if (m_Grounded && jump) {
 			m_Grounded = false;
 			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+			jumpSound.Play();
 		}
 	}
 
@@ -126,9 +139,11 @@ public class CharacterController2D : MonoBehaviour
 	}
 
 	private void WallJump () {
+		currWallJumpTime = wallJumpInterval;
 		float force = m_FacingRight ? -m_WallJumpPushForce : m_WallJumpPushForce;
         m_Rigidbody2D.AddForce(new Vector2 (force, m_WallJumpForce));
 		Flip();
+		jumpSound.Play();
     }
 
 	private void OnCollisionEnter2D(Collision2D other) {
@@ -143,7 +158,7 @@ public class CharacterController2D : MonoBehaviour
         }
     }
 
-	public bool isGrounded() {
+	public bool IsGrounded() {
 		return m_Grounded;
 	}
 }

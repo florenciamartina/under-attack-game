@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3a083873993ad0245acc5eae168a6f1d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - attackPoint: {instanceID: 0}
+  - meleeSound: {instanceID: 0}
+  - bulletPrefab: {fileID: 2738153095174499973, guid: 616dd7392b922d6469f65eed31f5ccf1,
+      type: 3}
+  - antibodyUI: {instanceID: 0}
+  - shootSound: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

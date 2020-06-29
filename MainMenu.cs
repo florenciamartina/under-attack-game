@@ -41,6 +41,13 @@ public class MainMenu : MonoBehaviour {
         isNewGame = isNew;
     }
 
+    public void CloseNewGame()
+    {
+        usersParent.gameObject.SetActive(false);
+        newGame.SetActive(true);
+        resumeGame.SetActive(true);
+    }
+
     public void ViewUsers() {
         newGame.SetActive(false);
         resumeGame.SetActive(false);

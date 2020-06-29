@@ -77,7 +77,7 @@ public class PlayerCombat : MonoBehaviour
         }
 
         // Ground Pound
-        if (!doGroundPound && !controller.isGrounded() && Input.GetButtonDown("GroundPound")) {
+        if (!doGroundPound && !controller.IsGrounded() && Input.GetButtonDown("GroundPound")) {
             doGroundPound = true;
             // groundPound_lift.Play();
         }

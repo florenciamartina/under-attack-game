@@ -34,7 +34,6 @@ public class PlayerMovement : MonoBehaviour {
         if (Input.GetButtonDown("Jump")) {
             jump = true;
             animator.SetBool("Jump", true);
-            jumpSound.Play();
         }
 
         if (Input.GetButtonDown("Fire1")) {

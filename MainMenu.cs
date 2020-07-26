@@ -9,21 +9,35 @@ using UnityEngine.EventSystems;
 public class MainMenu : MonoBehaviour {
     [SerializeField] private GameObject firstMenu;
     [SerializeField] private GameObject secondMenu;
+    [SerializeField] private GameObject settingsUI;
     [SerializeField] private GameObject playOrAlmanac;
     [SerializeField] private GameObject playButton;
-    [SerializeField] private GameObject inputWindow;
-    [SerializeField] private GameObject confirmButton;
-    [SerializeField] private GameObject usersWindow;
-    [SerializeField] private Transform usersParent;
-    [SerializeField] private TextMeshProUGUI[] users;
-    [SerializeField] private TMP_InputField nameInput;
 
-    [SerializeField] private TextMeshProUGUI warningText;
+    [Header("SFX")]
     [SerializeField] private AudioSource buttonSound;
     [SerializeField] private AudioSource backSound;
 
+    [Header("Input Window")]
+    [SerializeField] private GameObject inputWindow;
+    [SerializeField] private GameObject confirmButton;
+    [SerializeField] private GameObject usersWindow;
+    [SerializeField] private TMP_InputField nameInput;
+
+    [SerializeField] private TextMeshProUGUI warningText;
+
+    [Header("Select User")]
+    [SerializeField] private Transform usersParent;
+    [SerializeField] private TextMeshProUGUI[] users;
+
+    [Header("Delete User")]
+    [SerializeField] private GameObject deleteWindow;
+    [SerializeField] private GameObject confirmDelete;
+
+    private GameObject prevScene;
     private static int user;
     private bool isNewGame = false;
+
+    private int deleteUser;
 
     private void Awake() {
         for (int i = 0; i < users.Length; i++) {
@@ -34,7 +48,9 @@ public class MainMenu : MonoBehaviour {
         firstMenu.SetActive(true);
         secondMenu.SetActive(false);
         inputWindow.SetActive(false);
+        deleteWindow.SetActive(false);
         usersWindow.gameObject.SetActive(false);
+        settingsUI.SetActive(false);
     }
 
     private void Update() {
@@ -55,22 +71,41 @@ public class MainMenu : MonoBehaviour {
 
     public void Back() {
         backSound.Play();
-        usersWindow.gameObject.SetActive(false);
-        inputWindow.gameObject.SetActive(false);
-        warningText.gameObject.SetActive(false);
-        secondMenu.SetActive(false);
-        usersWindow.SetActive(false);
+
         playOrAlmanac.SetActive(false);
-        firstMenu.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(EventSystem.current.firstSelectedGameObject);
+        inputWindow.SetActive(false);
+        deleteWindow.SetActive(false);
+        warningText.gameObject.SetActive(false);
+        settingsUI.SetActive(false);
+
+        if (prevScene == firstMenu) {
+            secondMenu.SetActive(false);
+            usersWindow.SetActive(false);
+            firstMenu.SetActive(true);
+
+            EventSystem.current.SetSelectedGameObject(EventSystem.current.firstSelectedGameObject);
+
+        } else if (prevScene == usersWindow) {
+            prevScene = firstMenu;
+
+            firstMenu.SetActive(false);
+            secondMenu.SetActive(true);
+            usersWindow.SetActive(true);
+
+            EventSystem.current.SetSelectedGameObject(users[0].gameObject);
+        }
+
     }
 
     public void ViewUsers() {
         buttonSound.Play();
         firstMenu.SetActive(false);
         secondMenu.SetActive(true);
+        playOrAlmanac.SetActive(false);
         usersWindow.gameObject.SetActive(true);
         EventSystem.current.SetSelectedGameObject(users[0].gameObject);
+        
+        prevScene = firstMenu;
     }
 
 
@@ -89,7 +124,7 @@ public class MainMenu : MonoBehaviour {
             users[user - 1].text = nameInput.text;
             StartCoroutine(LoadNewScene());
         } else {
-            StartCoroutine("WarningText");
+            StartCoroutine(WarningText());
         }
     }
 
@@ -120,6 +155,11 @@ public class MainMenu : MonoBehaviour {
         SceneManager.LoadScene("almanac");
     }
 
+    public void Minigame() {
+        buttonSound.Play();
+        SceneManager.LoadScene("minigame");
+    }
+
     public static int GetUser() {
         return user;
     }
@@ -132,6 +172,9 @@ public class MainMenu : MonoBehaviour {
     public void SelectUser(int i) {
         buttonSound.Play();
         SetUser(i);
+
+        prevScene = usersWindow;
+
         if (IsNewGame()) {
             inputWindow.SetActive(true);
             nameInput.Select();
@@ -148,5 +191,29 @@ public class MainMenu : MonoBehaviour {
 
     private bool IsNewGame() {
         return users[user-1].text.Equals("NEW GAME");
+    }
+
+    public void Credits() {
+        SceneManager.LoadScene("creditroll");
+    }
+
+    public void ShowDeleteWindow(int toDeleteUser) {
+        deleteWindow.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(confirmDelete);
+        deleteUser = toDeleteUser;
+    }
+
+    public void DeleteAllPlayerData() {
+        //type here
+        Debug.Log("deleted all data");
+        SaveLoad.ResetData(deleteUser);
+        users[deleteUser - 1].text = "NEW GAME";
+        deleteWindow.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(users[0].gameObject);
+    }
+
+    public void ShowSettings() {
+        settingsUI.SetActive(true);
+        prevScene = firstMenu;
     }
 }

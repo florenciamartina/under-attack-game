@@ -7,16 +7,6 @@ public class PurpleBacteria : Enemy
     [Header("Clone")]
     [SerializeField] private GameObject purpleBacteria;
     // Start is called before the first frame update
-    void Start()
-    {
-        base.Start();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        base.Update();
-    }
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.CompareTag("Bullet"))
         {

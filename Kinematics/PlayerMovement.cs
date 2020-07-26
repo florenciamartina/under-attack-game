@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour {
 
-    private CharacterController2D controller;
-    private Animator animator;
+    protected CharacterController2D controller;
+    protected Animator animator;
     private bool jump = false;
     public bool canMove = true;
 
-    [SerializeField] private float runSpeed = 40f;
-    private float horizontalMove = 0f;
+    [SerializeField] protected float runSpeed = 40f;
+    protected float horizontalMove = 0f;
 
     [SerializeField] private AudioSource jumpSound;
     [SerializeField] private AudioSource playerHurt;
@@ -27,9 +27,7 @@ public class PlayerMovement : MonoBehaviour {
 
         if (!canMove) return;
 
-        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;  
-
-        animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+        HMove();
 
         if (Input.GetButtonDown("Jump")) {
             jump = true;
@@ -63,14 +61,14 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other) {
-        if (other.gameObject.tag == "DeathZone") {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-    }
 
     public void Hurt() {
         playerHurt.Play();
 		animator.SetBool("Hurt", true);
+    }
+
+    protected virtual void HMove() {
+        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;  
+        animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
     }
 }

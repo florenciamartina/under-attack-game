@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-public class SpecialCollectibles : MonoBehaviour
-{
+public class SpecialCollectibles : MonoBehaviour {
+    
     [SerializeField] private Sprite[] collSprites;
     private Image collUI;
     private int index;

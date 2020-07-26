@@ -14,8 +14,16 @@ public class Almanac_Pathogen : Almanac {
         characters = level == 0
             ? null
             : level == 1
-                ? charactersTemplate.GetRange(0, 2)
-                : charactersTemplate.GetRange(0, 4);
+                ? (SaveLoad.GetSceneIndex() < SaveLoad.maxLevel1 - 2 
+                    ? charactersTemplate.GetRange(0, 2) 
+                    : charactersTemplate.GetRange(0, 3))
+                : level == 2
+                    ? (SaveLoad.GetSceneIndex() < SaveLoad.maxLevel2 - 2
+                        ? charactersTemplate.GetRange(0, 4)
+                        : charactersTemplate.GetRange(0, 5))
+                    : characters = charactersTemplate;
+
+        // characters = charactersTemplate;
         
         RefreshUI();
     }

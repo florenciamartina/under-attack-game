@@ -19,4 +19,8 @@ public class CardDisplay : MonoBehaviour
         cardDesc.text = card.desc;
         price.text = card.price.ToString();
     }
+
+    public int GetID() {
+        return card.powerupID;
+    }
 }

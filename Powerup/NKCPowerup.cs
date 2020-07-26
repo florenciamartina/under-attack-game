@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShieldPowerup : Powerup {
-    [SerializeField] Sprite costume;
+public class NKCPowerup : Powerup {
     public override void ActivatePower(PowerupManager player) {
-        
-        player.SetCostume(costume);
-        player.ActivateShield();
+        StartCoroutine(player.ActivateNKC(activeTime));
     }
 }

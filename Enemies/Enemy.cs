@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
-{
+public class Enemy : MonoBehaviour {
     [Header("Stats")]
     [SerializeField] private HealthBar healthBar;
     [SerializeField] private int maxHealth = 100;
     private int health;
+    [SerializeField] private int bulletType;
     [SerializeField] private float speed = 5f;
     [SerializeField] protected int damage = 20;
-    [SerializeField] private float dazedTime = .6f;
+    [SerializeField] private float dazedTime = 1f;
     private float currDazedTime = 0f;
 
     [Header("Boundaries")]
-    [SerializeField] private float leftCap;
-    [SerializeField] private float rightCap;
+    [SerializeField] protected float leftCap;
+    [SerializeField] protected float rightCap;
 
     [Header("Sound FX")]
     [SerializeField] private AudioSource enemyDead;
 
-    private Animator animator;
-    private Rigidbody2D rb;
-    private Collider2D coll;
+    [SerializeField] protected ParticleSystem deadEffect;
 
+    protected Animator animator;
+    protected Rigidbody2D rb;
+    private Collider2D coll;
     protected bool facingLeft = true;
 
-    protected void Start() {
+    protected virtual void Start() {
         rb = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
@@ -39,8 +40,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    protected void Update() {
-
+    protected virtual void Update() {
         Move();
 
         if (healthBar != null) {
@@ -53,7 +53,6 @@ public class Enemy : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        
         animator.SetBool("Hurt", false);
     }
 
@@ -64,31 +63,40 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        if (facingLeft) {
-            if (transform.position.x > leftCap) {
+        // if (facingLeft) {
+        //     if (transform.position.x > leftCap) {
 
-                if (transform.localScale.x < 0) {
-                    transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y);
-                }
+        //         if (transform.localScale.x < 0) {
+        //             transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y);
+        //         }
 
-                rb.velocity = new Vector2(-speed, 0);
-            } else {
-                facingLeft = false;
-            }
-        } else {
-            if (transform.position.x < rightCap) {
-                if (transform.localScale.x > 0) {
-                    transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y);
-                }
+        //         rb.velocity = new Vector2(-speed, 0);
 
-                rb.velocity = new Vector2(speed, 0);
-            } else {
-                facingLeft = true;
-            }
-        }
+        //     } else {
+        //         facingLeft = false;
+        //     }
+        // } else {
+        //     if (transform.position.x < rightCap) {
+
+        //         if (transform.localScale.x > 0) {
+        //             transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y);
+        //         }
+
+        //         rb.velocity = new Vector2(speed, 0);
+        //     } else {
+        //         facingLeft = true;
+        //     }
+        // }
+
+        if (transform.position.x < leftCap && facingLeft || 
+            transform.position.x > rightCap && !facingLeft) Flip();
+
+        rb.velocity = facingLeft 
+            ? new Vector2(-speed, 0)
+            : new Vector2(speed, 0);
     }
 
-    public void TakeDamage(int damage) {
+    public virtual void TakeDamage(int damage) {
         animator.SetBool("Hurt", true);
 
         currDazedTime = dazedTime;
@@ -102,12 +110,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void Death() {
+    public virtual void Death() {
         //enemyDead.Play();
+        if (deadEffect != null) Instantiate(deadEffect, transform.position, transform.rotation);
         Destroy(gameObject);
     }
 
     private void OnCollisionEnter2D(Collision2D other) {
+        
+        if (other.gameObject.CompareTag("Destructible")) return;
         
         // Move a few space backwards if got hit by bullet.
         if (other.gameObject.tag == "Bullet") {
@@ -116,10 +127,21 @@ public class Enemy : MonoBehaviour
 			} else {
 				rb.AddForce(new Vector2(100f, 0f));
 			}
+        } else {
+            Flip();
         }
     }
 
     public int getDamage() {
         return damage;
+    }
+
+    public int GetBulletType() {
+        return bulletType;
+    }
+
+    protected void Flip() {
+        facingLeft = !facingLeft;
+        transform.Rotate(0f, 180f, 0f);
     }
 }

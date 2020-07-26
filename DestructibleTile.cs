@@ -5,6 +5,7 @@ using UnityEngine;
 public class DestructibleTile : MonoBehaviour
 {
     [SerializeField] private Sprite[] sprites = new Sprite[2];
+    [SerializeField] private AudioSource brokenSound;
 
     private SpriteRenderer spriteRenderer;
     [SerializeField] private int strength = 100;
@@ -13,6 +14,7 @@ public class DestructibleTile : MonoBehaviour
     private void Start() {
         currStrength = strength;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        brokenSound = GetComponent<AudioSource>();
     }
 
     private void Update() {
@@ -26,6 +28,7 @@ public class DestructibleTile : MonoBehaviour
     }
 
     public void TakeDamage(int damage) {
+        if (brokenSound != null) brokenSound.Play();
         currStrength -= damage;
     }
 }

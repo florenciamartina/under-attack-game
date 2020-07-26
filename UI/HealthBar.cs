@@ -11,11 +11,11 @@ public class HealthBar : MonoBehaviour
         slider = GetComponent<Slider>();
     }
     
-    public void SetMaxHealth(int maxHealth) {
+    public void SetMaxHealth(float maxHealth) {
         slider.maxValue = maxHealth;
         slider.value = maxHealth;
     }
-    public void SetHealth(int health) {
+    public void SetHealth(float health) {
         slider.value = health;
     }
 }

@@ -13,16 +13,14 @@ public class EnemyShooting : Enemy
     private float currTime;
 
     // Start is called before the first frame update
-    private void Start()
-    {
+    protected override void Start() {
         base.Start();
         currTime = 0;
         
     }
 
     // Update is called once per frame
-    private void Update()
-    {
+    protected override void Update() {
         base.Update();
         
         // Shooting

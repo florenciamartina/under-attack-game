@@ -5,18 +5,20 @@ using UnityEngine;
 public class Bullet_Enemy : MonoBehaviour
 {
     [SerializeField] private float speed = 4f;
-    public Rigidbody2D rb;
+    private Rigidbody2D rb;
 
-    private int damage = 5;
+    [SerializeField] private int damage = 5;
+
+    [SerializeField] private bool ignoreEnemies = true;
 
     // Start is called before the first frame update
-    void Start() {
+    protected virtual void Start() {
         rb = gameObject.GetComponent<Rigidbody2D>();
         rb.velocity = transform.right * speed;
     }
     
-    private void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "Collectible") return;
+    protected virtual void OnCollisionEnter2D(Collision2D other) {
+        if ((ignoreEnemies && other.gameObject.tag == "Enemy") || other.gameObject.tag == "Collectible") return;
         Destroy(gameObject);
     }
 
@@ -27,5 +29,9 @@ public class Bullet_Enemy : MonoBehaviour
 
     public int getDamage() {
         return damage;
+    }
+
+    public void SetSpeed(int speed) {
+        this.speed = speed;
     }
 }

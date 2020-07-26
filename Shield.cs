@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shield : MonoBehaviour
-{
+public class Shield : MonoBehaviour {
 
     [SerializeField] private int shieldMaxStrength;
-    private int shieldStrength;
+    private float shieldStrength;
 
     [SerializeField] private HealthBar shieldBar;
     [SerializeField] private GameObject costume;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         ResetShield(); 
     }
 
-    public void TakeDamage(int damage) {
+    public void TakeDamage(float damage) {
         shieldStrength -= damage;
         shieldBar.SetHealth(shieldStrength);
 

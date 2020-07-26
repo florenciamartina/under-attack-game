@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class CharacterController2D : MonoBehaviour
-{
+public class CharacterController2D : MonoBehaviour {
 	[Header("Jump Controls")]
 	[SerializeField] private float m_JumpForce = 250f;							// Amount of force added when the player jumps.
 	
@@ -150,15 +149,20 @@ public class CharacterController2D : MonoBehaviour
 
 		// Move a few space backwards if hit enemy.
         if (other.gameObject.tag == "Enemy") {
+			m_Rigidbody2D.velocity = Vector2.zero;
 			if (other.gameObject.transform.position.x > gameObject.transform.position.x) {
-				m_Rigidbody2D.AddForce(new Vector2(-2000f, 100f));
+				m_Rigidbody2D.AddForce(new Vector2(-100f, 0f));
 			} else {
-				m_Rigidbody2D.AddForce(new Vector2(2000f, 100f));
+				m_Rigidbody2D.AddForce(new Vector2(100f, 0f));
 			}
         }
     }
 
 	public bool IsGrounded() {
 		return m_Grounded;
+	}
+
+	public bool isTouchingWall() {
+		return m_TouchingWall;
 	}
 }

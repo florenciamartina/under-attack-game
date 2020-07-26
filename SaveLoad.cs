@@ -2,95 +2,49 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+// using UnityEngine.UIElements;
 
 [System.Serializable]
 public class SaveLoad: MonoBehaviour {
 
     private static int user;
+    
+    private static int prevSceneIndex;
     private static int currentSceneIndex;
     private static int sceneToContinue;
     private static int currentNutrigems;
     private static int savedNutrigems;
-    // private Dictionary<string, int> powerups = new Dictionary<string, int>();
-    // private Dictionary<string, int> characters = new Dictionary<string, int>();
-    // private Dictionary<string, int> pathogens = new Dictionary<string, int>();
 
-    private static string[] data = {"username", "CurrScene", "CurrNutrigems"};
+    private static string[] powerups = {"Shield", "NKC"};
+    private static string[] data = {"username", "PrevScene", "CurrScene", "CurrNutrigems", "Highscore"};
 
-    // public static SaveLoad saveManager = new SaveLoad();
-
-    // private void OnValidate() {
-
-    //     AddPowerups();
-    // }
-
-    // private void AddPowerups() {
-
-    //     // 0 means powerup is not yet available
-    //     powerups.Add("shield", 0);
-    //     powerups.Add("NKC", 0);
-    // }
+    public static int minLevel1 = 3;
+    public static int maxLevel1 = minLevel1 + 5;
+    public static int minLevel2 = maxLevel1 + 1;
+    public static int maxLevel2 = minLevel2 + 6;
+    public static int minLevel3 = maxLevel2 + 1;
+    public static int maxLevel3 = minLevel3 + 2;
 
     public static void SetUser(int i) {
         user = i;
     }
 
-    // public static void AddPowerup(string name) {
-    //     powerups[name] = 1;
-    // }
-
-    // private void AddCharacters(string name) {
-    //     characters.Add("Whiteboi", 0);
-    //     characters.Add("Oldie", 0);
-    // }
-
-    // public void AddCharacter(string name) {
-    //     characters[name] = 1;
-    // }    
-
-    // public void AddPathogen(string name) {
-    //     pathogens[name] = 1;
-    // }
-
-    // public void SaveCharacters(string[] characters) {
-    //     foreach(string character in characters) {
-    //         this.characters[character] = 1;
-    //     }
-
-    //     Save();
-    // }
-
-    // public void SavePathogens(string[] characters) {
-    //     foreach(string character in characters) {
-    //         pathogens[character] = 1;
-    //     }
-
-    //     Save();
-    // }
-
-    public static void Save(string powerupName) {
-        // AddPowerup(powerupName);
+    public static void Save(int powerupID) {
+        PlayerPrefs.SetInt(powerups[powerupID] + user, 1);
         Save();
     }
 
     public static void Save() {
-        currentSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+        prevSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        currentSceneIndex = prevSceneIndex + 1;
         currentNutrigems = PlayerStats.GetNutrigems();
+        PlayerPrefs.SetInt("PrevScene" + user, prevSceneIndex);
         PlayerPrefs.SetInt("CurrScene" + user, currentSceneIndex);
-        PlayerPrefs.SetInt("CurrNutrigems" + user, currentNutrigems);
-        
-        // foreach(string powerup in powerups.Keys) {
-        //     PlayerPrefs.SetInt(powerup + user, powerups[powerup]);
-        // }
+        PlayerPrefs.SetInt("CurrNutrigems" + user, PlayerPrefs.GetInt("CurrNutrigems" + user) + PlayerStats.GetNutrigems());
+    }
 
-        // foreach(string character in characters.Keys) {
-        //     PlayerPrefs.SetInt(character + user, characters[character]);
-        // }
-
-        // foreach(string character in pathogens.Keys) {
-        //     PlayerPrefs.SetInt(character + user, pathogens[character]);
-        // }
+    public static void Dead() {
+        PlayerPrefs.SetInt("PrevScene" + user, PlayerPrefs.GetInt("CurrScene" + user));
     }
 
     public static void Resume() {
@@ -103,24 +57,63 @@ public class SaveLoad: MonoBehaviour {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
-    // public static int GetNutrigems() {
-    //     return savedNutrigems;
-    // }
 
     public static int GetLevel() {
-        int sceneIndex = PlayerPrefs.GetInt("CurrScene" + user);
-        if (sceneIndex <= 6) {
+        int sceneIndex = PlayerPrefs.GetInt("CurrScene" + user, SceneManager.GetActiveScene().buildIndex);
+
+        if (sceneIndex < minLevel1) {
+            return 0;
+        } else if (sceneIndex <= maxLevel1) {
             return 1;
-        } else if (sceneIndex <= 10) {
+        } else if (sceneIndex <= maxLevel2) {
             return 2;
         } else {
-            return 0;
+            return 3;
         }
+    }
+
+    public static int GetSceneIndex() {
+        return PlayerPrefs.GetInt("CurrScene" + user);
+    }
+
+    public static int GetNutrigems() {
+        return PlayerPrefs.GetInt("CurrNutrigems" + user);
+    }
+
+    public static int GetPowerup(int powerupID) {
+        return PlayerPrefs.GetInt(powerups[powerupID] + user, 0);
+    }
+
+    public static int[] GetSuperpowers() {
+        int[] superpowers = new int[powerups.Length];
+        for (int i = 0; i < superpowers.Length; i++) {
+            superpowers[i] = GetPowerup(i);
+        }
+
+        return superpowers;
     }
 
     public static void ResetData(int user) {
         foreach(string playerdata in data) {
             PlayerPrefs.DeleteKey(playerdata + user);
         }
+
+        foreach(string powerup in powerups) {
+            PlayerPrefs.DeleteKey(powerup + user);
+        }
+    }
+    public static bool IsFirstTime() {
+        // Debug.Log(user);
+        // Debug.Log(PlayerPrefs.GetInt("PrevScene" + user, -1));
+        // Debug.Log(PlayerPrefs.GetInt("CurrScene" + user, -2));
+        return PlayerPrefs.GetInt("PrevScene" + user, -1) != PlayerPrefs.GetInt("CurrScene" + user, -2);
+    }
+
+    public static int GetHighscore() {
+        return PlayerPrefs.GetInt("Highscore" + user, 0);
+    }
+
+    public static void SaveHighScore(int highscore) {
+        PlayerPrefs.SetInt("Highscore" + user, highscore);
     }
 }

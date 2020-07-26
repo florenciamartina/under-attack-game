@@ -16,6 +16,10 @@ public class AlmanacMenu : MonoBehaviour {
         SceneManager.LoadScene("almanac");
     }
 
+    public void LoadCostumeAlmanac() {
+        SceneManager.LoadScene("almanac_costume");
+    }
+
     public void ResumeGame() {
         SaveLoad.Resume();
     }
